@@ -33,6 +33,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 
+import com.example.mghlcs.login.utility.Constants;
 import com.example.mghlcs.login.utility.MojoConnection;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.PersistentCookieStore;
@@ -334,7 +335,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         protected Boolean doInBackground(Void... params) {
             // TODO: attempt authentication against a network service.
             Log.v("Authentication", "Do authentication now " + mEmail + ":" + mPassword);
-            String urlString = "https://oncallweb.partners.org/oncall/authentication/VerifyOncallWebCredentials.asp";
+            String urlString = Constants.LOGIN_URL;
 
             URL url;
             HttpsURLConnection connection;
@@ -343,14 +344,13 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
                 // Simulate network access.
                 //Thread.sleep(2000);
-                //https://oncallweb.partners.org/oncall/authentication/VerifyOncallWebCredentials.asp
 
 //                AsyncHttpClient myClient = MojoConnection.myClient; //true to ignore ssl checking
 //                myClient.setCookieStore(myCookieStore);
 //                RequestParams params1 = new RequestParams();
 //                params1.put("PartnersUsername", "");
 //                params1.put("PartnersPassword","");
-//                myClient.post("https://oncallweb.partners.org/oncall/authentication/VerifyOncallWebCredentials.asp", params1, new TextHttpResponseHandler() {
+//                myClient.post(urlString, params1, new TextHttpResponseHandler() {
 //                    @Override
 //                    public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
 //                        Log.v("responseString", responseString);

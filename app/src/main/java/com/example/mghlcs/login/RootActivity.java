@@ -1,17 +1,23 @@
 package com.example.mghlcs.login;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.example.mghlcs.login.Objects.SubApp;
+import com.example.mghlcs.login.utility.Constants;
 import com.example.mghlcs.login.utility.MojoConnection;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
@@ -35,6 +41,8 @@ import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
@@ -45,6 +53,7 @@ import cz.msebera.android.httpclient.HttpResponse;
 import cz.msebera.android.httpclient.HttpStatus;
 
 public class RootActivity extends AppCompatActivity {
+    private static final int MENU_ITEM_LOGOUT = 1001;
     private UserSubAppTask mAuthTask = null;
     private ArrayList<String> subapps;
     private ArrayAdapter<String> adapter;
@@ -79,7 +88,6 @@ public class RootActivity extends AppCompatActivity {
             return;
         }
 
-
         subapps = new ArrayList<>();
         adapter = new ArrayAdapter<String>(
                 this,
@@ -97,8 +105,11 @@ public class RootActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 ListView definitionList = (ListView) findViewById(R.id.defination_list);
                 String text = definitionList.getItemAtPosition(position).toString();
-                if (text.equalsIgnoreCase("sub_name")) {
-                    Toast.makeText(RootActivity.this, "You got it!", Toast.LENGTH_SHORT).show();
+                if (text.equalsIgnoreCase(getResources().getString(R.string.subapp_name_transplant))) {
+                    //Toast.makeText(RootActivity.this, "You got it!", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(RootActivity.this, TransplantActivity.class);
+                    startActivity(intent);
+
                 } else {
                     Toast.makeText(RootActivity.this, "Wrong", Toast.LENGTH_SHORT).show();
                 }
@@ -125,6 +136,33 @@ public class RootActivity extends AppCompatActivity {
         getUserSubApps();
     }
 
+    //Display menu
+    public boolean onCreateOptionsMenu(Menu menu){
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        //add one by code
+        menu.add(0, MENU_ITEM_LOGOUT,102, R.string.logout);
+        return true;
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        switch (id) {
+            case R.id.action_settings:
+                //Snackbar.make(coodinatorLayout, )
+                  return true;
+            case R.id.action_about:
+                //
+                return true;
+            case MENU_ITEM_LOGOUT:
+                //do something here
+                return true;
+            case R.id.action_cart:
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     public void getUserSubApps() {
         if (mAuthTask != null) {
             return;
@@ -143,26 +181,12 @@ public class RootActivity extends AppCompatActivity {
 
             URL url;
             HttpsURLConnection connection;
-            //String urlString = "https://oncallweb.partners.org/javaprod2/mojo/json/user";
-            //String urlString = "https://oncallweb.partners.org";
-            //String urlString = "https://lcs124.partners.org:8280/mojo/json/user?login=xz020";
-            String urlString = "https://oncallweb.partners.org/javaprod2/mojo/json/user?login="+ userName;
+            String urlString = Constants.PROFILE_URL + "?login=" + userName;
 
             try {
                 url = new URL(urlString);
 
                 connection = (HttpsURLConnection) url.openConnection();
-
-                //CookieManager cookieManager = mojoConnection.getCookieManager();
-
-
-//                if(cookieManager.getCookieStore().getCookies().size() > 0)
-//                {
-//                    //While joining the Cookies, use ',' or ';' as needed. Most of the server are using ';'
-//                    connection.setRequestProperty("Cookie",
-//                            TextUtils.join(";",  cookieManager.getCookieStore().getCookies()));
-//                    Log.v("Cookie", "Set Cookie Root: " + TextUtils.join(";", cookieManager.getCookieStore().getCookies()));
-//                }
 
                 connection.setRequestMethod("GET");
                 connection.setRequestProperty("USER-AGENT", "Mozilla/5.0");
@@ -201,11 +225,23 @@ public class RootActivity extends AppCompatActivity {
                                 JSONObject subappJson = new JSONObject(jsonObject.get(key).toString());
                                 String subAppString = subappJson.get("subapp").toString();
                                 JSONArray subappJsonArray = new JSONArray(subAppString);
+
+                                List<SubApp> subapplist= new ArrayList<SubApp>();
+
+                                SubApp subApp;
                                 for (int i = 0; i < subappJsonArray.length(); i++) {
                                     JSONObject item = (JSONObject) subappJsonArray.get(i);
-                                    String brandName = item.getString("description");
-                                    String brandIcon = item.getString("iconPath");
-                                    subapps.add(brandName);
+                                    subApp = new SubApp(item);
+                                    subapplist.add(subApp);
+                                }
+                                Collections.sort(subapplist, new Comparator <SubApp>() {
+                                    @Override
+                                    public int compare(SubApp subApp2, SubApp subApp1) {
+                                        return subApp2.getBrandSortOrder().compareTo(subApp1.getBrandSortOrder());
+                                    }
+                                });
+                                for (SubApp subapp:subapplist) {
+                                    subapps.add(subapp.getBrandName());
                                 }
                             }
                         }

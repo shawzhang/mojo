@@ -17,6 +17,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.mghlcs.login.utility.Constants;
 import com.example.mghlcs.login.utility.MojoConnection;
 
 import java.io.BufferedReader;
@@ -107,7 +108,7 @@ public class VerificationActivity extends AppCompatActivity {
         @Override
         protected Boolean doInBackground(Void... params) {
             Log.v("Authentication", "Verification now: username= " + username + " password: " + password + " ConfirmationKey: " + verificationCode);
-            String urlString = "https://oncallweb.partners.org/oncall/authentication/VerifyOncallWebCredentials.asp";
+            String urlString = Constants.VERIFY_URL;
 
             URL url;
             HttpsURLConnection connection;

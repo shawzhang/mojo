@@ -14,4 +14,14 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
+    <string name="logout">Logout</string>
+    <string name="title_activity_transplant">Transplant</string>
+    <string name="subapp_name_schedule">Schedule</string>
+    <string name="subapp_name_synapse">Synapse</string>
+    <string name="subapp_name_message">Messaging</string>
+    <string name="subapp_name_rolodex">Rolodex</string>
+    <string name="subapp_name_apprentice">Apprentice</string>
+    <string name="subapp_name_page">Page</string>
+    <string name="subapp_name_settings">Settings</string>
+    <string name="subapp_name_transplant">Transplant</string>
 </resources>
