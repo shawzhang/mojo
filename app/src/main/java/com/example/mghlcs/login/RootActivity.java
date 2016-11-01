@@ -17,6 +17,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.example.mghlcs.login.Objects.SubApp;
+import com.example.mghlcs.login.Root.CustomListAdapter;
 import com.example.mghlcs.login.utility.Constants;
 import com.example.mghlcs.login.utility.MojoConnection;
 import com.loopj.android.http.AsyncHttpClient;
@@ -34,6 +35,7 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Array;
 import java.net.CookieManager;
 import java.net.HttpCookie;
 import java.net.MalformedURLException;
@@ -41,6 +43,7 @@ import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -55,19 +58,19 @@ import cz.msebera.android.httpclient.HttpStatus;
 public class RootActivity extends AppCompatActivity {
     private static final int MENU_ITEM_LOGOUT = 1001;
     private UserSubAppTask mAuthTask = null;
-    private ArrayList<String> subapps;
+    private ArrayList<String> subapp_names;
+    private ArrayList<Integer> subapp_images;
     private ArrayAdapter<String> adapter;
     private MojoConnection mojoConnection;
     private String userName;
     private Boolean verifiedUser = false;
 
- //   private final String MOJO_SERVICE_HOST = "https://oncallweb.partners.org/javatest2/mojo";
-    private final String MOJO_SERVICE_HOST = "https://oncallweb.partners.org/javaprod2/mojo";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_root);
+        //enable search
+        //onSearchRequested();
 
         mojoConnection = MojoConnection.getInstance(getApplicationContext());
         mojoConnection.setConnection();
@@ -83,20 +86,21 @@ public class RootActivity extends AppCompatActivity {
         }
         Log.v("Cookie userName", userName + " verified user? " + verifiedUser);
         if (!verifiedUser) {
-            Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-            startActivity(intent);
+            backToLogin();
             return;
         }
 
-        subapps = new ArrayList<>();
-        adapter = new ArrayAdapter<String>(
-                this,
-                //android.R.layout.simple_list_item_1, android.R.id.text1,
-                R.layout.root_apps,
-                R.id.the_item_text,
-                subapps
-        );
+        subapp_names = new ArrayList<>();
+        subapp_images = new ArrayList<>();
+//        adapter = new ArrayAdapter<String>(
+//                this,
+//                //android.R.layout.simple_list_item_1, android.R.id.text1,
+//                R.layout.root_apps,
+//                R.id.the_item_text,
+//                subapps
+//        );
 
+        CustomListAdapter adapter=new CustomListAdapter(this, subapp_names, subapp_images);
 
         ListView definitionList = (ListView) findViewById(R.id.defination_list);
         definitionList.setAdapter(adapter);
@@ -136,6 +140,10 @@ public class RootActivity extends AppCompatActivity {
         getUserSubApps();
     }
 
+    private void backToLogin() {
+        Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+        startActivity(intent);
+    }
     //Display menu
     public boolean onCreateOptionsMenu(Menu menu){
         getMenuInflater().inflate(R.menu.menu_main, menu);
@@ -155,7 +163,11 @@ public class RootActivity extends AppCompatActivity {
                 //
                 return true;
             case MENU_ITEM_LOGOUT:
-                //do something here
+                //do something here, delete all cookies
+                mojoConnection.removeCookies();
+                //reload the page?
+                Intent intent = new Intent(RootActivity.this, LoginActivity.class);
+                startActivity(intent);
                 return true;
             case R.id.action_cart:
                 return true;
@@ -241,7 +253,10 @@ public class RootActivity extends AppCompatActivity {
                                     }
                                 });
                                 for (SubApp subapp:subapplist) {
-                                    subapps.add(subapp.getBrandName());
+                                    subapp_names.add(subapp.getBrandName());
+                                    int pokeId = getResources().getIdentifier(subapp.getBrandIconName().toLowerCase(), "drawable", getPackageName());
+
+                                    subapp_images.add(pokeId);
                                 }
                             }
                         }
@@ -256,6 +271,8 @@ public class RootActivity extends AppCompatActivity {
 
             } catch (IOException e) {
                 Log.v("Authentication", "IOException " + e.toString());
+                //Go back to Login page
+                backToLogin();
                 return false;
 
             }
@@ -267,7 +284,8 @@ public class RootActivity extends AppCompatActivity {
         protected void onPostExecute(final Boolean success) {
             mAuthTask = null;
             if (success) {
-                Log.v("Display", subapps.toString());
+                Log.v("Display", subapp_names.toString());
+                Log.v("Display image", subapp_images.toString());
                 //adapter.notifyDataSetChanged();
                 //finish();
             } else {

@@ -29,6 +29,7 @@ public class TransplantActivity extends AppCompatActivity {
             public void onClick(View view) {
                 //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                 //        .setAction("Action", null).show();
+                /*
                 String[] address = {email};
                 Intent intent = new Intent(Intent.ACTION_SENDTO);
                 intent.setData(Uri.parse("mailto:"));
@@ -38,6 +39,7 @@ public class TransplantActivity extends AppCompatActivity {
                 if (intent.resolveActivity(getPackageManager()) != null) {
                     startActivity(intent);
                 }
+                */
             }
         });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);

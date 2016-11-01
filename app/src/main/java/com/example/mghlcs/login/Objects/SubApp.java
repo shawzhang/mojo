@@ -37,6 +37,15 @@ public class SubApp {
         return brandIcon;
     }
 
+    public String getBrandIconName() {
+        int iend = brandIcon.indexOf("."); //this finds the first occurrence of "."
+        if (iend != -1) {
+            return brandIcon.substring(0 , iend);
+        } else {
+            return brandIcon;
+        }
+    }
+
     public void setBrandIcon(String brandIcon) {
         this.brandIcon = brandIcon;
     }

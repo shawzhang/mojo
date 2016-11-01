@@ -77,9 +77,12 @@ public class MojoConnection {
         return cookies;
     }
     public void setConnection() {
-        trustEveryone();
+       // trustEveryone();
     }
 
+    public void removeCookies() {
+        instance.cookieManager.getCookieStore().removeAll();
+    }
 
     public String printResponse(HttpsURLConnection conn) {
         try {

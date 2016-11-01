@@ -10,14 +10,6 @@
     android:paddingTop="16dp"
     tools:context="com.example.mghlcs.login.RootActivity">
 
-        <TextView
-            android:text="Mojo Root"
-            android:textSize="32dp"
-            android:id="@+id/title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-        </TextView>
-
             <ListView
                 android:id="@+id/defination_list"
                 android:layout_width="match_parent"

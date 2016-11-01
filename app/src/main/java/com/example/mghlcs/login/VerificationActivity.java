@@ -132,7 +132,7 @@ public class VerificationActivity extends AppCompatActivity {
 
 
                 if (connection.getResponseCode() == HttpsURLConnection.HTTP_OK ) {
-                    //Log.v("Authentication content:", connection.getContent().toString());
+                    Log.v("Authentication content:", responseOutput);
                     if (responseOutput.contains("AuthenticationSuccess")) {
                         return true;
                     } else {
