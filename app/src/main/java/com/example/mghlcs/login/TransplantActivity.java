@@ -7,14 +7,42 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+
+import com.example.mghlcs.login.Objects.KidneyHotList;
+import com.example.mghlcs.login.utility.Constants;
+import com.example.mghlcs.login.utility.KidneyListAdapter;
+import com.squareup.okhttp.Callback;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import static android.R.attr.data;
+import static com.loopj.android.http.AsyncHttpClient.log;
 
 public class TransplantActivity extends AppCompatActivity {
 
     private static String webUrl = "http://www.google.com";
     private static String email = "info@test.com";
+    private ArrayList<String> definations;
+    private KidneyListAdapter adapter;
+
+    private ListView mListView;
+
+    private ArrayList<KidneyHotList> hotListArrayList= new ArrayList<KidneyHotList>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,29 +50,86 @@ public class TransplantActivity extends AppCompatActivity {
         setContentView(R.layout.activity_transplant);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        /*
+        adapter = new ArrayAdapter<String>(
+                TransplantActivity.this,
+                R.layout.content_transplant,
+                R.id.patientCell,
+                hotListArrayList
+        );
+*/
+
+
+        //Get data
+        String hot_list_url = Constants.TX_HOT_LIST_URL + "?organ=Kidney&abo=o";
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder()
+                .url(hot_list_url)
+                .build();
+
+        client.newCall(request).enqueue(new Callback() {
             @Override
-            public void onClick(View view) {
-                //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                //        .setAction("Action", null).show();
-                /*
-                String[] address = {email};
-                Intent intent = new Intent(Intent.ACTION_SENDTO);
-                intent.setData(Uri.parse("mailto:"));
-                intent.putExtra(Intent.EXTRA_EMAIL,address);
-                intent.putExtra(Intent.EXTRA_SUBJECT, "Information request");
-                intent.putExtra(Intent.EXTRA_TEXT,"Please send some information");
-                if (intent.resolveActivity(getPackageManager()) != null) {
-                    startActivity(intent);
+            public void onFailure(Request request, IOException e) {
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onResponse(Response response) throws IOException {
+                if (!response.isSuccessful()) {
+                    throw new IOException("Unexpected code " + response);
+                } else {
+                    String responseBody = response.body().string();
+                    Log.v("list",responseBody);
+                    processData(responseBody);
                 }
-                */
             }
         });
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-    }
 
+        mListView = (ListView)findViewById(R.id.hot_list_view);
+        Log.v("list length", Integer.toString(hotListArrayList.size()));
+        adapter = new KidneyListAdapter(this,hotListArrayList);
+        mListView.setAdapter(adapter);
+     }
+
+    private void processData(String data) {
+        //Json
+        try {
+            JSONObject jsonRootObject = new JSONObject(data);
+
+                        JSONObject patientsRoot = jsonRootObject.getJSONObject("patients");
+
+                        //Get the instance of JSONArray that contains JSONObjects
+                        JSONArray jsonArray = patientsRoot.optJSONArray("patient");
+
+                        //Iterate the jsonArray and print the info of JSONObjects
+                        for(int i=0; i < jsonArray.length(); i++){
+                            JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+                            KidneyHotList kidneyHotList = new KidneyHotList(jsonObject);
+                            hotListArrayList.add(kidneyHotList);
+                            /*
+                            String mrn = jsonObject.optString("mrn").toString();
+                            String dob = jsonObject.optString("dob").toString();
+                            String name = jsonObject.optString("name").toString();
+                            */
+                            Log.v("list length", Integer.toString(hotListArrayList.size()));
+                            //Log.v("list","mrn=" + kidneyHotList.getMrn() + " dob=" + kidneyHotList.getAbo() + " name=" + kidneyHotList.getPatientName());
+                            //data += "Node"+i+" : \n id= "+ id +" \n Name= "+ name +" \n Salary= "+ salary +" \n ";
+                        }
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    //stuff that updates ui//
+                     adapter.notifyDataSetChanged();
+                }
+            });
+
+        } catch (JSONException e) {e.printStackTrace();}
+        //definations.add(response.body().string());
+
+    }
     //Display menu
     public boolean onCreateOptionsMenu(Menu menu){
         getMenuInflater().inflate(R.menu.menu_main, menu);

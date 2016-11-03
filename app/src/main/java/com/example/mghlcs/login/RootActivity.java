@@ -115,7 +115,7 @@ public class RootActivity extends AppCompatActivity {
                     startActivity(intent);
 
                 } else {
-                    Toast.makeText(RootActivity.this, "Wrong", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(RootActivity.this, "Not Available", Toast.LENGTH_SHORT).show();
                 }
 
             }
