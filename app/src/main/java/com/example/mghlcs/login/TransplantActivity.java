@@ -146,6 +146,7 @@ public class TransplantActivity extends AppCompatActivity {
             case R.id.action_about:
                 //
                 return true;
+            /*
             case R.id.action_web:
                 Intent webIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(webUrl));
                 if (webIntent.resolveActivity(getPackageManager()) != null) {
@@ -154,6 +155,7 @@ public class TransplantActivity extends AppCompatActivity {
                 return true;
             case R.id.action_cart:
                 return true;
+                */
         }
         return super.onOptionsItemSelected(item);
     }

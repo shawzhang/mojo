@@ -56,14 +56,19 @@ import cz.msebera.android.httpclient.HttpResponse;
 import cz.msebera.android.httpclient.HttpStatus;
 
 public class RootActivity extends AppCompatActivity {
+
     private static final int MENU_ITEM_LOGOUT = 1001;
+    private static final String STATE_ITEMS = "items";
+
     private UserSubAppTask mAuthTask = null;
     private ArrayList<String> subapp_names;
     private ArrayList<Integer> subapp_images;
-    private ArrayAdapter<String> adapter;
+    //private ArrayAdapter<String> adapter;
     private MojoConnection mojoConnection;
     private String userName;
     private Boolean verifiedUser = false;
+    private ListView subAppList;
+    private CustomListAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,23 +97,15 @@ public class RootActivity extends AppCompatActivity {
 
         subapp_names = new ArrayList<>();
         subapp_images = new ArrayList<>();
-//        adapter = new ArrayAdapter<String>(
-//                this,
-//                //android.R.layout.simple_list_item_1, android.R.id.text1,
-//                R.layout.root_apps,
-//                R.id.the_item_text,
-//                subapps
-//        );
 
-        CustomListAdapter adapter=new CustomListAdapter(this, subapp_names, subapp_images);
+        adapter=new CustomListAdapter(this, subapp_names, subapp_images);
 
-        ListView definitionList = (ListView) findViewById(R.id.defination_list);
-        definitionList.setAdapter(adapter);
-        definitionList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        subAppList = (ListView) findViewById(R.id.sub_app_list);
+        subAppList.setAdapter(adapter);
+        subAppList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                ListView definitionList = (ListView) findViewById(R.id.defination_list);
-                String text = definitionList.getItemAtPosition(position).toString();
+                String text = subAppList.getItemAtPosition(position).toString();
                 if (text.equalsIgnoreCase(getResources().getString(R.string.subapp_name_transplant))) {
                     //Toast.makeText(RootActivity.this, "You got it!", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(RootActivity.this, TransplantActivity.class);
@@ -120,23 +117,7 @@ public class RootActivity extends AppCompatActivity {
 
             }
         });
-//        AsyncHttpClient myClient = MojoConnection.myClient; //true to ignore ssl checking
-//        PersistentCookieStore myCookieStore = new PersistentCookieStore(getApplicationContext());
-//        myClient.setCookieStore(myCookieStore);
-//        RequestParams params = new RequestParams();
-//        params.put("PartnersUsername", "");
-//        //params.put("PartnersPassword","");
-//        myClient.post("https://lcsmdc-nsvip-p-14.partners.org/default.asp", params, new TextHttpResponseHandler() {
-//            @Override
-//            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-//                Log.v("responseString", responseString);
-//            }
-//
-//            @Override
-//            public void onSuccess(int statusCode, Header[] headers, String responseString) {
-//                Log.v("responseString", responseString);
-//            }
-//        });
+
         getUserSubApps();
     }
 
@@ -168,8 +149,6 @@ public class RootActivity extends AppCompatActivity {
                 //reload the page?
                 Intent intent = new Intent(RootActivity.this, LoginActivity.class);
                 startActivity(intent);
-                return true;
-            case R.id.action_cart:
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -254,9 +233,9 @@ public class RootActivity extends AppCompatActivity {
                                 });
                                 for (SubApp subapp:subapplist) {
                                     subapp_names.add(subapp.getBrandName());
-                                    int pokeId = getResources().getIdentifier(subapp.getBrandIconName().toLowerCase(), "drawable", getPackageName());
+                                    int imgId = getResources().getIdentifier(subapp.getBrandIconName().toLowerCase(), "drawable", getPackageName());
 
-                                    subapp_images.add(pokeId);
+                                    subapp_images.add(imgId);
                                 }
                             }
                         }
@@ -285,12 +264,13 @@ public class RootActivity extends AppCompatActivity {
             mAuthTask = null;
             if (success) {
                 Log.v("Display", subapp_names.toString());
-                Log.v("Display image", subapp_images.toString());
-                //adapter.notifyDataSetChanged();
+                Log.v("Display", subapp_images.toString());
+                adapter.notifyDataSetChanged();
                 //finish();
             } else {
                 Log.v("Display", "Failed");
             }
         }
+
     }
 }
