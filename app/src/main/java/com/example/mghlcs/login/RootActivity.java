@@ -63,7 +63,6 @@ public class RootActivity extends AppCompatActivity {
     private UserSubAppTask mAuthTask = null;
     private ArrayList<String> subapp_names;
     private ArrayList<Integer> subapp_images;
-    //private ArrayAdapter<String> adapter;
     private MojoConnection mojoConnection;
     private String userName;
     private Boolean verifiedUser = false;
